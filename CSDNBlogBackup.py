@@ -50,8 +50,8 @@ def extractBlogLists(user_name='lanbing510',loop_times=1000):
             if not m:
                 continue
             url_count+=1
-            print url_count
-            print url
+            print(url_count)
+            print(url)
             title=spider.lastHtmlTitle().split(' -')[0]
             title=title.replace('/',' ') #标题中有特殊符号时的处理
             title=title.replace('_',' ')
@@ -66,9 +66,9 @@ def extractBlogLists(user_name='lanbing510',loop_times=1000):
         else:
             #Did we get an error or are there no more URLs to crawl?
             if (spider.get_NumUnspidered() == 0):
-                print "No more URLs to spider"
+                print("No more URLs to spider")
             else:
-                print spider.lastErrorText()
+                print(spider.lastErrorText())
         #Sleep 1 second before spidering the next URL.
         spider.SleepMs(1000)
     f.close()
@@ -81,7 +81,7 @@ def downloadBlogLists(user_name='lanbing510'):
     mht = chilkat.CkMht()
     success = mht.UnlockComponent("Anything for 30-day trial")
     if (success != True):
-        print(mht.lastErrorText())
+        print((mht.lastErrorText()))
         sys.exit()
 
     file_path='URList-'+user_name+'.txt'
@@ -94,7 +94,7 @@ def downloadBlogLists(user_name='lanbing510'):
         title=m.group(2)
         mht_doc = mht.getMHT(url)
         if (mht_doc == None ):
-            print(mht.lastErrorText())
+            print((mht.lastErrorText()))
             sys.exit()
             
         if not os.path.exists('CSDN-'+user_name):
@@ -108,16 +108,16 @@ def downloadBlogLists(user_name='lanbing510'):
             #print(mht.lastErrorText())
             fout.write(line)
         else:
-            print("Successfully Downloaded "+title.decode('gbk'))
+            print(("Successfully Downloaded "+title.decode('gbk')))
     f.close()
     fout.close()
     if iter_count>=5:
-        print u"Some Blogs May Not Be Downloaded Successfully, Pleace Make Sure By Checking Error.txt And Index.html."
+        print("Some Blogs May Not Be Downloaded Successfully, Pleace Make Sure By Checking Error.txt And Index.html.")
         os.remove(file_path)
         os.rename('URList-'+user_name+'-backup.txt',file_path)
     if iter_count<10 and os.path.getsize('Error.txt')>0:
         iter_count+=1
-        print u"进行第 "+str(iter_count)+u" 次迭代下载"
+        print("进行第 "+str(iter_count)+" 次迭代下载")
         os.remove(file_path)
         os.rename('Error.txt',file_path)
         downloadBlogLists(user_name)
@@ -134,7 +134,7 @@ def generateIndex(user_name='lanbing510'):
         m=re.search('(http.+[0-9]{7,}),(.+)',line)
         title=m.group(2)
         title=title.decode('gbk').encode('utf-8')
-        print title
+        print(title)
         fout.write("""<li><a href=\""""+title+".html"+"""\">"""+title+"""</a></li>\n""")
     fout.write("""</ol>""")
     fout.write(tail_string)
@@ -143,12 +143,12 @@ def generateIndex(user_name='lanbing510'):
 
 
 if __name__=='__main__':
-    print "Please Input The Username Of Your CSDN Blog"
-    user_name=raw_input()
-    print "Start Extracting  Blog List..."
+    print("Please Input The Username Of Your CSDN Blog")
+    user_name=input()
+    print("Start Extracting  Blog List...")
     extractBlogLists(user_name)
-    print "Start Downloading Blog List..."
+    print("Start Downloading Blog List...")
     downloadBlogLists(user_name)
-    print "Start Generating Index.html..."
+    print("Start Generating Index.html...")
     generateIndex(user_name)
-    print "Done"
+    print("Done")
