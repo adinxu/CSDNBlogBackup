@@ -1,6 +1,7 @@
 ## <span style="color:green;">写在前面@adinxu</span>
 <span style="color:green;">我本来是想要把csdn博客迁移到github page上，网站啥的都搞好了，但是把文章挪过来却是个麻烦事。  
 在github上搜索发现了这个项目，下载下来，当时安装chilkat库时好像就因为site-packet结果报错，折腾了一会。后来安装好也没正常运行。我看见了下上次commit时间是2016年了，今天花了点时间看了看python，之前没学过，看的也头晕眼花，用惯了c语言的我，一边看，一边经常在说：还能这样？看完之后先用2to3把文件转了，因为我用的python3，而很明显，原来是Python2的。然后只有一个编码问题需要解决就ok了。虽然这个脚本可以完美运行了，但还是不是我想要的。我想要的是提取出markdown文件，方便修改，而且需要取出创建日期，用以给markdown文件命名，因为这是github page对post的要求。其他的元数据里的分类和tag就不说了。不过好歹是把文章全都下下来了，虽然全部都是html格式的。等我再找找吧。
+ps:CSDNBlogBackup.py.bak是原始文件的备份，方便直接比较查看修改内容。
 </span>
 
 # Python实现CSDN博客的完美备份
