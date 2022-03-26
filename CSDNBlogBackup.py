@@ -1,15 +1,11 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Dec 03 15:06:27 2015
 
-@author: 冰蓝
-"""
-import re
-import os
-import sys
+import re#正则表达式操作
+import os#多种操作系统接口
+import sys#系统相关的参数和函数
 import chilkat
 
-
+#报文头字符串
 head_string="""
 <html>
 <head>
@@ -26,6 +22,7 @@ head_string="""
 </head>
 <body>
 """
+#报文尾字符串
 tail_string="""
 </body>
 </html>
@@ -33,13 +30,14 @@ tail_string="""
 
 iter_count=0
 
-
-def extractBlogLists(user_name='lanbing510',loop_times=1000):
-    url="http://blog.csdn.net/%s/" % user_name
+#爬取文章列表
+def extractBlogLists(user_name='m0_37565736',loop_times=1000):
+    url="http://blog.csdn.net/{0}/".format(user_name)
+    print("the user blog base url is ".format(url))
     spider=chilkat.CkSpider()
     spider.Initialize(url)
-    pattern=user_name+'/article/details'
-    file_path='URList-'+user_name+'.txt'
+    pattern=user_name+'/article/details'#具体文章路径的匹配模式
+    file_path='URLList-'+user_name+'.txt'
     f=open(file_path,'w')
     url_count=0
     for i in range(0,loop_times):
@@ -48,7 +46,7 @@ def extractBlogLists(user_name='lanbing510',loop_times=1000):
             url=spider.lastUrl()
             m=re.search(pattern,url)
             if not m:
-                continue
+                continue#必须是指定用户的文章才保存链接
             url_count+=1
             print(url_count)
             print(url)
@@ -61,7 +59,7 @@ def extractBlogLists(user_name='lanbing510',loop_times=1000):
             title=title.replace('|',' ')
             title=title.replace('#','sharp')
             f.write(url+","+title+'\n')
-            #Print The HTML META title
+            #Print(The HTML META title)
             #print(spider.lastHtmlTitle().decode('gbk'))
         else:
             #Did we get an error or are there no more URLs to crawl?
@@ -73,10 +71,10 @@ def extractBlogLists(user_name='lanbing510',loop_times=1000):
         spider.SleepMs(1000)
     f.close()
     #对生产的文件进行备份
-    open('URList-'+user_name+'-backup.txt', "w").write(open(file_path, "r").read())
+    open('URLList-'+user_name+'-backup.txt', "w").write(open(file_path, "r").read())
 
-
-def downloadBlogLists(user_name='lanbing510'):
+#下载所有文章
+def downloadBlogLists(user_name='m0_37565736'):
     global iter_count
     mht = chilkat.CkMht()
     success = mht.UnlockComponent("Anything for 30-day trial")
@@ -84,12 +82,12 @@ def downloadBlogLists(user_name='lanbing510'):
         print((mht.lastErrorText()))
         sys.exit()
 
-    file_path='URList-'+user_name+'.txt'
+    file_path='URLList-'+user_name+'.txt'
     f=open(file_path,'r')
     fout=open('Error.txt','w')
     
     for line in f.readlines():
-        m=re.search('(http.+[0-9]{7,}),(.+)',line)
+        m=re.search('(http.+[0-9]{7,}),(.+)',line)#文章链接最后必定为9位数字
         url=m.group(1)
         title=m.group(2)
         mht_doc = mht.getMHT(url)
@@ -105,16 +103,17 @@ def downloadBlogLists(user_name='lanbing510'):
         parts_subdir = title
         success = mht.UnpackMHTString(mht_doc,unpack_dir,html_filename,parts_subdir)
         if (success != True):
-            #print(mht.lastErrorText())
+            print(mht.lastErrorText())
             fout.write(line)
         else:
-            print(("Successfully Downloaded "+title.decode('gbk')))
+            print(("Successfully Downloaded "+title))
     f.close()
     fout.close()
     if iter_count>=5:
         print("Some Blogs May Not Be Downloaded Successfully, Pleace Make Sure By Checking Error.txt And Index.html.")
+        #移除本次结果，将上次结果作为本次处理的数据
         os.remove(file_path)
-        os.rename('URList-'+user_name+'-backup.txt',file_path)
+        os.rename('URLList-'+user_name+'-backup.txt',file_path)
     if iter_count<10 and os.path.getsize('Error.txt')>0:
         iter_count+=1
         print("进行第 "+str(iter_count)+" 次迭代下载")
@@ -122,9 +121,9 @@ def downloadBlogLists(user_name='lanbing510'):
         os.rename('Error.txt',file_path)
         downloadBlogLists(user_name)
 
-
-def generateIndex(user_name='lanbing510'):
-    file_path='URList-'+user_name+'.txt'
+#生成索引页面
+def generateIndex(user_name='m0_37565736'):
+    file_path='URLList-'+user_name+'.txt'
     f=open(file_path,'r')
     fout=open('./CSDN-'+user_name+'/Index.html','w')
     fout.write(head_string)
@@ -133,7 +132,7 @@ def generateIndex(user_name='lanbing510'):
     for line in f.readlines():
         m=re.search('(http.+[0-9]{7,}),(.+)',line)
         title=m.group(2)
-        title=title.decode('gbk').encode('utf-8')
+        #title=title.decode('gbk').encode('utf-8')
         print(title)
         fout.write("""<li><a href=\""""+title+".html"+"""\">"""+title+"""</a></li>\n""")
     fout.write("""</ol>""")
@@ -145,6 +144,7 @@ def generateIndex(user_name='lanbing510'):
 if __name__=='__main__':
     print("Please Input The Username Of Your CSDN Blog")
     user_name=input()
+    user_name='m0_37565736'
     print("Start Extracting  Blog List...")
     extractBlogLists(user_name)
     print("Start Downloading Blog List...")
