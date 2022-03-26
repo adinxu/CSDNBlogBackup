@@ -106,7 +106,7 @@ def downloadBlogLists(user_name='m0_37565736'):
             print(mht.lastErrorText())
             fout.write(line)
         else:
-            print(("Successfully Downloaded "+title))
+            print("Successfully Downloaded "+title)
     f.close()
     fout.close()
     if iter_count>=5:
@@ -125,14 +125,14 @@ def downloadBlogLists(user_name='m0_37565736'):
 def generateIndex(user_name='m0_37565736'):
     file_path='URLList-'+user_name+'.txt'
     f=open(file_path,'r')
-    fout=open('./CSDN-'+user_name+'/Index.html','w')
+    #此处需指定编码方式，否则乱码
+    fout=open('./CSDN-'+user_name+'/Index.html','w',encoding="utf-8")
     fout.write(head_string)
     fout.write("""<h2>"""+user_name+"的博客"+"""</h2>\n""")
     fout.write("""<ol>\n""")
     for line in f.readlines():
         m=re.search('(http.+[0-9]{7,}),(.+)',line)
         title=m.group(2)
-        #title=title.decode('gbk').encode('utf-8')
         print(title)
         fout.write("""<li><a href=\""""+title+".html"+"""\">"""+title+"""</a></li>\n""")
     fout.write("""</ol>""")
@@ -144,7 +144,6 @@ def generateIndex(user_name='m0_37565736'):
 if __name__=='__main__':
     print("Please Input The Username Of Your CSDN Blog")
     user_name=input()
-    user_name='m0_37565736'
     print("Start Extracting  Blog List...")
     extractBlogLists(user_name)
     print("Start Downloading Blog List...")
