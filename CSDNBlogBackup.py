@@ -33,7 +33,7 @@ iter_count=0
 #爬取文章列表
 def extractBlogLists(user_name='m0_37565736',loop_times=1000):
     url="http://blog.csdn.net/{0}/".format(user_name)
-    print("the user blog base url is ".format(url))
+    print("the user blog base url is {0}".format(url))
     spider=chilkat.CkSpider()
     spider.Initialize(url)
     pattern=user_name+'/article/details'#具体文章路径的匹配模式
@@ -51,13 +51,14 @@ def extractBlogLists(user_name='m0_37565736',loop_times=1000):
             print(url_count)
             print(url)
             title=spider.lastHtmlTitle().split(' -')[0]
-            title=title.replace('/',' ') #标题中有特殊符号时的处理
-            title=title.replace('_',' ')
-            title=title.replace(':',' ')
-            title=title.replace('*',' ')
-            title=title.replace('?',' ')
-            title=title.replace('|',' ')
-            title=title.replace('#','sharp')
+            #Todo:可以加入去除用户名的处理
+            #标题中有特殊符号时的处理
+            specialpatt="[/_:\*\?||#]"
+            n=re.search(specialpatt,title)
+            if n:
+                print("old title is {0}".format(title))
+                title=re.sub(specialpatt,'-',title)
+                print("new title is {0}".format(title))
             f.write(url+","+title+'\n')
             #Print(The HTML META title)
             #print(spider.lastHtmlTitle().decode('gbk'))
@@ -144,6 +145,8 @@ def generateIndex(user_name='m0_37565736'):
 if __name__=='__main__':
     print("Please Input The Username Of Your CSDN Blog")
     user_name=input()
+    if not user_name:
+        user_name = "m0_37565736"
     print("Start Extracting  Blog List...")
     extractBlogLists(user_name)
     print("Start Downloading Blog List...")
