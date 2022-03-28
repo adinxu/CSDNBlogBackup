@@ -33,7 +33,7 @@ iter_count=0
 #爬取文章列表
 def extractBlogLists(user_name='m0_37565736',loop_times=1000):
     url="http://blog.csdn.net/{0}/".format(user_name)
-    print("the user blog base url is {0}".format(url))
+    print("the user blog base url is {}".format(url))
     spider=chilkat.CkSpider()
     spider.Initialize(url)
     pattern=user_name+'/article/details'#具体文章路径的匹配模式
@@ -53,7 +53,7 @@ def extractBlogLists(user_name='m0_37565736',loop_times=1000):
             title=spider.lastHtmlTitle().split(' -')[0]
             #Todo:可以加入去除用户名的处理
             #标题中有特殊符号时的处理
-            specialpatt="[/_:\*\?||#]"
+            specialpatt=r'[_\/:*?"<>|\n]'
             n=re.search(specialpatt,title)
             if n:
                 print("old title is {0}".format(title))
